@@ -1,0 +1,18 @@
+- hosts: localhost
+  vars:
+    ssh_key_name: "id_rsa_ansible"
+    source_key: "./ssh/{{ ssh_key_name }}"
+    dest_key: "{{ lookup('env', 'HOME') }}/.ssh/{{ ssh_key_name }}"
+  tasks:
+    - name: Set fact for current user's home directory
+      set_fact:
+        user_home: "{{ lookup('env', 'HOME') }}"
+      tags: common
+    - name: Get current user using whoami command
+      command: whoami
+      register: current_user
+      tags: common
+    - import_tasks: tasks/ssh.yml
+      tags:
+        - ssh
+    - import_tasks: tasks/git-clone.yml

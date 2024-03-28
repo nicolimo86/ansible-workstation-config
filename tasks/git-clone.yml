@@ -1,0 +1,119 @@
+- name: Append SSH config
+  ansible.builtin.blockinfile:
+    path: "{{ user_home }}/.ssh/config"
+    block: |
+      {{ repo_ssh_host }}
+    marker: "## {mark} ANSIBLE MANAGED BLOCK"
+    create: true
+    mode: "0600"
+    state: present
+  tags:
+    - common
+
+- name: dotfiles | check already exists
+  stat:
+    path: "{{ user_home }}/dotfiles"
+  register: dotfiles
+  tags:
+    - common
+
+- name: dotfiles
+  ansible.builtin.git:
+    repo: "{{ repo_dotfiles }}"
+    dest: "{{ user_home }}/dotfiles"
+    key_file: "{{ user_home }}/.ssh/{{ ssh_key_name }}"
+    accept_hostkey: true
+  when:
+    - not dotfiles.stat.exists
+  tags:
+    - common
+
+- name: pb | check already exists
+  stat:
+    path: "{{ repo_pb_dest }}"
+  register: pb
+  tags:
+    - common
+
+- name: pb
+  ansible.builtin.git:
+    repo: "{{ repo_pb }}"
+    dest: "{{ repo_pb_dest }}"
+    key_file: "{{ user_home }}/.ssh/{{ ssh_key_name }}"
+    accept_hostkey: true
+  when:
+    - not pb.stat.exists
+  tags:
+    - common
+
+- name: pm | check already exists
+  stat:
+    path: "{{ repo_pm_dest }}"
+  register: pm
+  tags:
+    - personal
+
+- name: pm
+  ansible.builtin.git:
+    repo: "{{ repo_pm }}"
+    dest: "{{ repo_pm_dest }}"
+    key_file: "{{ user_home }}/.ssh/{{ ssh_key_name }}"
+    accept_hostkey: true
+  when:
+    - not pm.stat.exists
+  tags:
+    - personal
+
+- name: pm-work | check already exists
+  stat:
+    path: "{{ repo_pm_work_dest }}"
+  register: pmwork
+  tags:
+    - work
+
+- name: pm work
+  ansible.builtin.git:
+    repo: "{{ repo_pm_work }}"
+    dest: "{{ repo_pm_work_dest }}"
+    key_file: "{{ user_home }}/.ssh/id_rsa_ansible"
+    accept_hostkey: true
+  when:
+    - not pmwork.stat.exists
+  tags:
+    - work
+
+- name: pm-work | check already exists
+  stat:
+    path: "{{ repo_pm_work_dest2 }}"
+  register: pmwork
+  tags:
+    - personal
+
+- name: pm work
+  ansible.builtin.git:
+    repo: "{{ repo_pm_work }}"
+    dest: "{{ repo_pm_work_dest2 }}"
+    key_file: "{{ user_home }}/.ssh/id_rsa_ansible"
+    accept_hostkey: true
+  when:
+    - not pmwork.stat.exists
+  tags:
+    - personal
+
+- name: dx | check already exists
+  stat:
+    path: "{{ repo_dx_dest }}"
+  register: dx
+  tags:
+    - personal
+
+- name: dx
+  ansible.builtin.git:
+    repo: "{{ repo_dx }}"
+    dest: "{{ repo_dx_dest }}"
+    key_file: "{{ user_home }}/.ssh/{{ ssh_key_name }}"
+    accept_hostkey: true
+  when:
+    - not dx.stat.exists
+  tags:
+    - personal
