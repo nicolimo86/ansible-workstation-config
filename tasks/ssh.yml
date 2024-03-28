@@ -1,0 +1,28 @@
+- name: Ensure .ssh directory exists.
+  file:
+    dest: "{{ user_home }}/.ssh/"
+    mode: 0700
+    state: directory
+  tags:
+    - ssh
+
+- name: Copy files
+  copy:
+    content: "{{ item.value }}"
+    dest: "{{ item.key }}"
+    mode: '400'
+  no_log: true
+  loop: "{{ files | dict2items }}"
+  tags:
+    - common
+    - ssh
+
+- name: Set authorized key taken from file
+  ansible.posix.authorized_key:
+    user: "{{ current_user.stdout }}"
+    state: present
+    key: "{{ lookup('file', item) }}"
+  with_fileglob:
+    - "{{ user_home }}/.ssh/*.pub"
+  tags:
+    - ssh
